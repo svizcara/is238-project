@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 29, 2019 at 01:33 AM
+-- Generation Time: Nov 29, 2019 at 08:03 AM
 -- Server version: 5.7.27
 -- PHP Version: 7.0.33-0+deb9u6
 
@@ -122,7 +122,7 @@ INSERT INTO `tickets` (`ticket_no`, `subscriber_no`, `message`, `date_sent`, `ag
 (1, '9062038475', 'Hi, need your help.', '2019-11-28 20:43:45', 'agent', 'Hi, what\'s your concern?', '2019-11-28 23:35:20'),
 (2, '9062038475', 'Hi, I have a concern. ', '2019-11-29 00:16:08', 'agent', 'How may I help you?', '2019-11-29 00:17:00'),
 (3, '9778171882', 'Kahit ano', '2019-11-29 00:36:48', 'agent', 'Ano pong concern nyo?', '2019-11-29 00:37:42'),
-(4, '9778171882', 'Pabili pong suka. ', '2019-11-29 00:39:11', NULL, NULL, NULL);
+(4, '9778171882', 'Pabili pong suka. ', '2019-11-29 00:39:11', 'agent', 'Wala po kaming suka. Refer ko na lang po kayo sa kabilang tindahan.', '2019-11-29 02:22:54');
 
 -- --------------------------------------------------------
 
@@ -185,6 +185,12 @@ ALTER TABLE `tickets`
   ADD PRIMARY KEY (`ticket_no`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -208,6 +214,11 @@ ALTER TABLE `site`
 --
 ALTER TABLE `tickets`
   MODIFY `ticket_no` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
