@@ -1,39 +1,9 @@
 <?php include 'header.php';?>
-       
-  <div id="wrapper">
-
-    <!-- Sidebar -->
-    <ul class="sidebar navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="index.php">
-          <i class="fas fa-fw fa-tachometer-alt"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>Settings</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <h6 class="dropdown-header">Site:</h6>
-          <a class="dropdown-item" href="configure.php">Configuration</a>
-          <a class="dropdown-item" ></a>
-          <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">User</h6>
-          <a class="dropdown-item" href="changepwd.php">Change Password</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="">
-          <i class="fas fa-fw fa-table"></i>
-          <span>Logs</span></a>
-      </li>
-    </ul>
-
-    <div id="content-wrapper">
-
-      <div class="container-fluid">
+    <div id="wrapper">
+<?php include 'sidebar.php';?>
+     <div id="content-wrapper">
+         <div class="container-fluid">
+         
 
         <!-- Breadcrumbs-->
         <ol class="breadcrumb">
