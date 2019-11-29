@@ -7,7 +7,7 @@ $site_url = 'http://localhost/helpdesk/';
 $db_host = 'localhost';
 $db_name = 'helpdeskdb';
 $db_user = 'root';
-$db_pass = 'KwQ8RDrlqCUsiTxD';
+$db_pass = 'root';
 
 // EMAIL ADDRESS FOR SENDING NOTIFICATIONS
 $mail_host  = 'smtp.gmail.com';              // Specify main and backup SMTP servers

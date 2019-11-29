@@ -19,6 +19,21 @@
                     $('#modalticketNo').val(id_value);
             });
         </script>
+
+        <script>
+            window.setTimeout(function () {
+                $(".alert-success").fadeTo(200, 0).slideUp(200, function () {
+                $(this).remove();
+                });
+            }, 5000);
+            
+            window.setTimeout(function () {
+                $(".alert-warning").fadeTo(200, 0).slideUp(200, function () {
+                $(this).remove();
+                });
+            }, 5000);
+        </script>
+
           <!-- Core plugin JavaScript-->
           <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 

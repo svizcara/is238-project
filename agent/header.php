@@ -8,18 +8,18 @@ get_siteinfo();
 
 //session_start(); 
 if (!isset($_SESSION['user'])) {
-    $_SESSION['msg'] = '<div class="alert alert-warning" role="alert">You must log in first</div>';
+    $_SESSION['msg'] = '<div class="alert alert-warning fixed-top" role="alert">You must log in first</div>';
     exit(header('location: ../index.php'));
 }else {
     if ( $_SESSION['user']['user_type'] != 'agent' ) {
-        $_SESSION['msg'] = '<div class="alert alert-warning" role="alert">You must log as agent to access this page</div>';
+        $_SESSION['msg'] = '<div class="alert alert-warning fixed-top" role="alert">You must log as agent to access this page</div>';
         exit(header('location: ../index.php'));
     }
 }
 
 if (isset($_GET['logout'])) {
   	session_destroy();
-  	exit(header("location: ../login.php"));
+  	exit(header("location: ../index.php"));
     unset($_SESSION['user']);
 }
 ?>

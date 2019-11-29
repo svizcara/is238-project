@@ -14,11 +14,6 @@ get_siteinfo();
         <meta name="author" content="IS238 2019 Group A">
         <title><?php echo $_SESSION['siteinfo']['site_title']; ?> | <?php echo $_SESSION['siteinfo']['site_desc']; ?> </title>
         
-        <!-- favicons-->
-        <link rel="icon" type="image/png" sizes="32x32" href="content/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="96x96" href="content/favicon-96x96.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="content/favicon-16x16.png">
-        
         <!-- Custom fonts for this template-->
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
 

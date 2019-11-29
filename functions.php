@@ -55,24 +55,20 @@ if ( isset($_POST['savecfg_btn']) ) {
     save_config();
 }
 
-////GLOBE API INTEGRATION STARTS HERE
-//if ( isset($_GET['access_token']) ) {
-//	get_subscriber();
-//}
-
 
 // REGISTER USER
 function register(){
 	// call these variables with the global keyword to make them available in function
-	global $db, $errors, $username, $firstname, $lastname, $email1, $email2, $password, $admin_email, $admin_pwd, $mail_host, $site_url;
+	global $db, $query, $errors, $username, $firstname, $lastname, $email,  $passwd1, $passwd2;
 
 	// receive all input values from the form. Call the e() function
     // defined below to escape form values
-	$username    =  e($_POST['username']);
-    $firstname   =  e($_POST['firstname']);
-    $lastname    =  e($_POST['lastname']);
-	$email1      =  e($_POST['email1']);
-    $email2      =  e($_POST['email2']);
+    $firstname  =  e($_POST['firstname']);
+    $lastname   =  e($_POST['lastname']);
+    $username   =  e($_POST['username']);
+	$email      =  e($_POST['email']);
+    $passwd1    =  e($_POST['passwd1']);
+    $passwd2    =  e($_POST['passwd2']);
 
      //prepare a select statement
     $sql = "SELECT id FROM users WHERE username = ?";
@@ -103,7 +99,7 @@ function register(){
                     mysqli_stmt_bind_param($stmt, "s", $param_email);
 
                     // set parameters
-                    $param_email = e($_POST['email1']);
+                    $param_email = $email;
 
                     // attempt to execute the prepared statement
                     if(mysqli_stmt_execute($stmt)){
@@ -113,12 +109,9 @@ function register(){
                         if(mysqli_stmt_num_rows($stmt) == 1){
                             array_push($errors, "Email address is already registered.");
                         } else{
-                            $email1 = e($_POST['email1']);
-                            
-                             if ($email1 != $email2) { 
-                                 array_push($errors, "Email addresses do not match!"); 
+                             if ( $passwd1 != $passwd2 ) { 
+                                 array_push($errors, "Passwords do not match!"); 
                              }
-
                         }
                     } else{
                         echo "Oops! Something went wrong. Please try again later.";
@@ -128,23 +121,27 @@ function register(){
         } else{
             echo "Oops! Something went wrong. Please try again later.";
         }
+    
         mysqli_stmt_close($stmt);
     }
     
 	// register user if there are no errors in the form
 	if (count($errors) == 0) {
-        $password = random_pwd(12);
-		$password_hash = md5($password);//TO-DO make this more secure
+		$password_hash = md5($passwd1);//TO-DO make this more secure
+        $user_type = "agent";
+        $query = "INSERT INTO users (username, user_type, password, email, first_name, last_name) VALUES('$username', '$user_type', '$password_hash','$email', '$firstname', '$lastname')";
+        
+        if ( mysqli_query($db, $query) ){
 
-		if (isset($_POST['user_type'])) {
-			$user_type = e($_POST['user_type']);
-			$query = "INSERT INTO users (username, user_type, password, email, first_name, last_name) VALUES('$username', '$user_type', '$password_hash','$email1', '$firstname', '$lastname')";
-			mysqli_query($db, $query);
-            
-			$_SESSION['success']  = "New user successfully created!!";
-			header('location: index.php');
-		}
-	}
+            $_SESSION['success']  = '<div class="alert alert-success fixed-top"><strong>New user successfully created!</strong></div>';
+            header('location: manage-agents.php');
+            exit;
+        } else {
+            array_push($errors, "Something went wrong. :( <br/>".mysqli_error($db));
+        }
+    } else {
+        array_push($errors, "Something went wrong. :( <br/>".mysqli_error($db));
+    }
     mysqli_close($db);
 }
 
@@ -183,7 +180,7 @@ function login(){
                 // check if user is admin or user
                 if ($logged_in_user['user_type'] == 'admin') {
                     $_SESSION['user'] = $logged_in_user;
-                    $_SESSION['success']  = '<div class="alert alert-success"><strong>Login successful!</strong> You are now logged in. </div>';
+                    $_SESSION['success']  = '<div class="alert alert-success fixed-top"><strong>Login successful!</strong> You are now logged in. </div>';
                     exit(header('location: admin/index.php'));		
 
                 } else{
@@ -193,7 +190,7 @@ function login(){
 
                     $_SESSION['user'] = $logged_in_user;
                     $_SESSION['userinfo'] = mysqli_fetch_assoc($results);
-                    $_SESSION['success']  = '<div class="alert alert-success"><strong>Login successful!</strong> You are now logged in. </div>';
+                    $_SESSION['success']  = '<div class="alert alert-success fixed-top"><strong>Login successful!</strong> You are now logged in. </div>';
                     header('location: agent/index.php');
                     exit;
                 }
@@ -230,7 +227,7 @@ function chpwd(){
         mysqli_query($db, $query);
         
         $_SESSION['user']['password'] = $newpwd_hash;
-        $_SESSION['success']  = '<div class="alert alert-success" role="alert"><strong>Password successfully changed!</strong></div>';
+        $_SESSION['success']  = '<div class="alert alert-success fixed-top" role="alert"><strong>Password successfully changed!</strong></div>';
         exit(header('location: index.php'));
     }
     mysqli_close($db);
@@ -280,7 +277,7 @@ function reset_password() {
                 $mail->AltBody = 'Hi there, please visit the following link to reset your password: '.$site_url.'new-password.php?token='.$token;
 
                 $mail->send();
-                $_SESSION['success'] = '<div class="alert alert-success"> Password reset link sent to your email.</div>';
+                $_SESSION['success'] = '<div class="alert alert-success fixed-top"> Password reset link sent to your email.</div>';
             } catch (Exception $e) {
                 array_push($errors,'Email not sent. Please contact site administrator.');
             }
@@ -314,7 +311,7 @@ function new_password() {
                 
                 $query = "UPDATE users SET password = '$passwordhash' WHERE email = '$email'";
                 if ( mysqli_query($db, $query) ) {
-                    $_SESSION['success'] = '<div class="alert alert-success"> <strong> Password changed!</strong> You may now <a href="login.php">login to your account using the new password</a>.</div>';
+                    $_SESSION['success'] = '<div class="alert alert-success fixed-top"> <strong> Password changed!</strong> You may now <a href="login.php">login to your account using the new password</a>.</div>';
                     header('location: login.php');
                     exit();
                 } else {
@@ -487,7 +484,6 @@ function list_tickets() {
     mysqli_close($db);
 }
 
-
 // escape string function for processing input texts
 function e($val){
 	global $db;
@@ -499,7 +495,7 @@ function display_error() {
 	global $errors;
     
 	if (count($errors) > 0){
-		echo '<div class="error alert alert-warning d-flex justify-content-center" role="alert">';
+		echo '<div class="error alert alert-warning d-flex justify-content-center fixed-top" role="alert">';
 			foreach ($errors as $error){
 				echo $error .'<br>';
 			}
@@ -521,6 +517,7 @@ function get_siteinfo() {
     }        
 }
 
+//change site configuration
 function save_config() {
     global $db, $errors;
     $site_url = e($_POST['site_url']);
@@ -541,35 +538,89 @@ function save_config() {
     $query .= "UPDATE site SET meta_value='$app_secret' WHERE meta_key='app_secret'; ";
     
     if ($retval = mysqli_multi_query($db, $query)){
-        $_SESSION['success']  = '<div class="alert alert-success"><strong>Site configuration saved!</strong></div>';
+        $_SESSION['success']  = '<div class="alert alert-success fixed-top"><strong>Site configuration saved!</strong></div>';
         exit(header('location:configure.php'));
     } else {
         array_push($errors, mysqli_error($db));
     }        
 }
 
+// LIST SUBSCRIBERS
+function list_subscribers() {
+    global $db, $errors;
+    
+    $query = "SELECT * FROM subscribers";
+    $retval = mysqli_query($db, $query); 
+    
+    if (mysqli_num_rows($retval) > 0) {
+        echo "<thead class='thead-dark'><tr><th>Subscriber No.</th><th>Access Token</th><th>Date Subscribed</th><th>Status</th><th>Actions</th></tr></thead><tbody>";
+        
+        while($row = mysqli_fetch_assoc($retval)) {
+            echo "<tr><td>".$row['subscriber_no']."</td><td>";
+            echo $row['access_token']."</td><td>";
+            echo $row['date_subscribed']."</td><td>";           
+            echo ($row['subscribed']?"Subscribed":"Unsubscribed")."</td><td>";
+            echo "</td></tr>";
+        }
+        echo "</tbody></table>";
+    } else {
+        echo "<a href='#'> No subscribers yet. </a>";
+    }
+    
+}
 
-//function get_subscriber() {
-//    global $db, $query, $errors;
-//    
-//    $access_token = $_GET['access_token'];
-//    $subscriber_no = $_GET['subscriber_number'];
-////    
-//    $query = "SELECT * FROM subscribers WHERE subscriber_no='$subscriber_no' LIMIT 1";
-//    $retval = mysqli_query($db, $query); 
-////    
-//    if (mysqli_num_rows($retval) == 1) {
-//        $query = "UPDATE subscribers SET access_token='$access_token' WHERE subscriber_no='$subscriber_no'";
-//    } else {
-//        $query = "INSERT INTO subscribers (subscriber_no, access_token) VALUES ('$subscriber_no', '$access_token')";
-//    }
-////
-//    if ( mysqli_query($db, $query) ) {
-//        exit(header('location:index.php'));
-//    } else {
-//        array_push($errors, mysqli_error($db));
-//    }
-//    
-//    mysqli_close($db);
-//}
+// LIST AGENTS
+function list_agents() {
+    global $db, $errors;
+    
+    $query = "SELECT * FROM users where user_type='agent'";
+    $retval = mysqli_query($db, $query); 
+    
+    if (mysqli_num_rows($retval) > 0) {
+        echo "<thead class='thead-dark'><tr><th>User ID</th><th>Username</th><th>First Name</th><th>Last Name</th><th>Email Address</th><th>Date Registered</th><th>Actions</th></tr></thead><tbody>";
+        
+        while($row = mysqli_fetch_assoc($retval)) {
+            echo "<tr><td>".$row['id']."</td><td>";
+            echo $row['username']."</td><td>";
+            echo $row['first_name']."</td><td>";           
+            echo $row['last_name']."</td><td>";
+            echo $row['email']."</td><td>";
+            echo $row['date_registered']."</td><td>";
+            echo "</td></tr>";
+        }
+        echo "</tbody></table>";
+    } else {
+        echo "<a href='#'> No subscribers yet. </a>";
+    }
+    
+}
+
+
+//get total new messages
+function get_total_new() {
+    global $db, $query;
+    $query = "SELECT COUNT(ticket_no) AS total FROM tickets WHERE response IS NULL";
+    $retval = mysqli_query($db, $query);
+    $value = mysqli_fetch_assoc($retval);
+    echo $value['total'];
+}
+
+//get total addressed messages
+function get_total_addressed() {
+    global $db, $query;
+    $query = "SELECT COUNT(ticket_no) AS total FROM tickets WHERE response IS NOT NULL";
+    $retval = mysqli_query($db, $query);
+    $value = mysqli_fetch_assoc($retval);
+    echo $value['total'];
+}
+
+//get total subscribers
+function get_total_subscribers() {
+    global $db, $query;
+    $query = "SELECT COUNT(subscriber_no) AS total FROM subscribers";
+    $retval = mysqli_query($db, $query);
+    $value = mysqli_fetch_assoc($retval);
+    echo $value['total'];
+}
+
 ?>
