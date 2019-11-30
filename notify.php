@@ -46,20 +46,31 @@ function get_data() {
     // Converts it into a PHP object
     $data = json_decode($json,true);
     
-    if ( $value=$data['inboundSMSMessageList'] ) {
-        $max = $value['numberOfMessagesInThisBatch'];
-        
-        for ( $i = 0; $i < $max; $i++ ) {
-            $timestamp = date("Y-m-d H:i:s",strtotime($value['inboundSMSMessage'][$i]['dateTime']));
-            $sender = substr($value['inboundSMSMessage'][$i]['senderAddress'],-10);
-            $message = $value['inboundSMSMessage'][$i]['message'];
-        
-            $query = "INSERT INTO tickets (subscriber_no, message, date_sent) VALUES ('$sender', '$message', '$timestamp')";
+    try{
+        if ( $value=$data['unsubscribed'] ) {
+            $timestamp = date("Y-m-d H:i:s",strtotime($value['timestamp']));
+            $subscriber_no = substr($value['subscriber_number'],-10);
+            
+            $query = "UPDATE subscribers SET subscribed=0, date_unsubscribed='$timestamp' WHERE subscriber_no='$subscriber_no'";
             mysqli_query($db, $query);
+            
+        } else if ( $value=$data['inboundSMSMessageList'] ) {
+            $max = $value['numberOfMessagesInThisBatch'];
+
+            for ( $i = 0; $i < $max; $i++ ) {
+                $timestamp = date("Y-m-d H:i:s",strtotime($value['inboundSMSMessage'][$i]['dateTime']));
+                $sender = substr($value['inboundSMSMessage'][$i]['senderAddress'],-10);
+                $message = $value['inboundSMSMessage'][$i]['message'];
+
+                $query = "INSERT INTO tickets (subscriber_no, message, date_sent) VALUES ('$sender', '$message', '$timestamp')";
+                mysqli_query($db, $query);
+            }
+
+        } else if ($value=$data['outboundSMSMessageRequest']){
+
         }
-        
-    } else if ($value=$data['outboundSMSMessageRequest']){
-        
+    } catch (exception $e){
+        //pass
     }
 }
 mysqli_close($db);

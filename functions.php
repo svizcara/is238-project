@@ -55,6 +55,14 @@ if ( isset($_POST['savecfg_btn']) ) {
     save_config();
 }
 
+if ( isset($_GET['activate']) ) {
+    activate_user($_GET['id']);
+}
+
+if ( isset($_GET['deactivate']) ) {
+    deactivate_user($_GET['id']);
+}
+
 
 // REGISTER USER
 function register(){
@@ -231,6 +239,22 @@ function chpwd(){
         exit(header('location: index.php'));
     }
     mysqli_close($db);
+}
+
+// ACTIVATE USER
+function activate_user($id) {
+    global $db;
+    
+    $query = "UPDATE users SET isDeactivated=0 WHERE id=$id";
+    mysqli_query($db, $query);
+}
+
+// ACTIVATE USER
+function deactivate_user($id) {
+    global $db, $errors;
+    
+    $query = "UPDATE users SET isDeactivated=1 WHERE id=$id";
+    mysqli_query($db, $query);
 }
 
 // FORGOT PASSWORD
@@ -553,13 +577,13 @@ function list_subscribers() {
     $retval = mysqli_query($db, $query); 
     
     if (mysqli_num_rows($retval) > 0) {
-        echo "<thead class='thead-dark'><tr><th>Subscriber No.</th><th>Access Token</th><th>Date Subscribed</th><th>Status</th><th>Actions</th></tr></thead><tbody>";
+        echo "<thead class='thead-dark'><tr><th>Subscriber No.</th><th>Access Token</th><th>Date Subscribed</th><th>Status</th></tr></thead><tbody>";
         
         while($row = mysqli_fetch_assoc($retval)) {
             echo "<tr><td>".$row['subscriber_no']."</td><td>";
             echo $row['access_token']."</td><td>";
             echo $row['date_subscribed']."</td><td>";           
-            echo ($row['subscribed']?"Subscribed":"Unsubscribed")."</td><td>";
+            echo ($row['subscribed']?"<span class='badge badge-success'>Subscribed</span>":"<span class='badge badge-secondary'>Unsubscribed</span>");
             echo "</td></tr>";
         }
         echo "</tbody></table>";
@@ -586,6 +610,11 @@ function list_agents() {
             echo $row['last_name']."</td><td>";
             echo $row['email']."</td><td>";
             echo $row['date_registered']."</td><td>";
+            if ( $row['isDeactivated'] ) {
+                echo "<a class='btn btn-success' href='manage-agents.php?activate=1&id=".$row['id']."'>Activate</a>";
+            } else {
+                echo "<a class='btn btn-danger' href='manage-agents.php?deactivate=1&id=".$row['id']."'>Deactivate</a>";
+            }
             echo "</td></tr>";
         }
         echo "</tbody></table>";
